@@ -1,4 +1,4 @@
-// models/Task.js - MongoDB Task schema
+
 const mongoose = require('mongoose');
 
 const TaskSchema = new mongoose.Schema({
@@ -63,12 +63,11 @@ const TaskSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Create indexes for faster lookups
 TaskSchema.index({ workflowId: 1, status: 1 });
 TaskSchema.index({ assignedTo: 1, status: 1 });
 TaskSchema.index({ parentTaskId: 1 });
 
-// Method to mark task as in progress
+
 TaskSchema.methods.startTask = function(assignedTo = null) {
   this.status = 'in_progress';
   if (assignedTo) {
@@ -77,7 +76,7 @@ TaskSchema.methods.startTask = function(assignedTo = null) {
   return this.save();
 };
 
-// Method to complete task
+
 TaskSchema.methods.completeTask = function(resultData = {}) {
   this.status = 'completed';
   this.completedAt = new Date();
@@ -94,7 +93,7 @@ TaskSchema.methods.completeTask = function(resultData = {}) {
   return this.save();
 };
 
-// Method to fail task
+
 TaskSchema.methods.failTask = function(errorMessage, errorCode = null) {
   this.status = 'failed';
   this.errorDetails = {
@@ -105,7 +104,7 @@ TaskSchema.methods.failTask = function(errorMessage, errorCode = null) {
   return this.save();
 };
 
-// Method to retry task
+
 TaskSchema.methods.retry = function() {
   if (this.retryCount < this.maxRetries) {
     this.retryCount += 1;
@@ -116,12 +115,12 @@ TaskSchema.methods.retry = function() {
   }
 };
 
-// Static method to find tasks by workflow
+
 TaskSchema.statics.findByWorkflow = function(workflowId) {
   return this.find({ workflowId }).sort({ createdAt: -1 });
 };
 
-// Static method to find pending tasks
+
 TaskSchema.statics.findPendingTasks = function(limit = 100) {
   return this.find({ 
     status: 'pending',

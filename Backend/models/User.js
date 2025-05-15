@@ -1,4 +1,4 @@
-// models/User.js - MongoDB User schema
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -69,7 +69,6 @@ const UserSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Hash password before saving
 UserSchema.pre('save', async function() {
   if (!this.isModified('password')) return;
   
@@ -77,7 +76,7 @@ UserSchema.pre('save', async function() {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Create JWT token for authentication
+
 UserSchema.methods.createJWT = function() {
   return jwt.sign(
     { userId: this._id, email: this.email, role: this.role },
@@ -86,18 +85,17 @@ UserSchema.methods.createJWT = function() {
   );
 };
 
-// Compare password with hashed password in database
 UserSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Update last login time
+
 UserSchema.methods.updateLoginTime = function() {
   this.lastLogin = new Date();
   return this.save();
 };
 
-// Find users by role
+
 UserSchema.statics.findByRole = function(role) {
   return this.find({ role, isActive: true });
 };

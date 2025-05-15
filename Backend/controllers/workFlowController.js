@@ -1,9 +1,9 @@
-// controllers/workflowController.js - Workflow API controller
+
 const Workflow = require('./models/Workflow');
 const Task = require('../models/Task');
 const WorkflowExecutionEngine = require('../services/WorkflowExecutionEngine');
 
-// GET all workflows
+
 exports.getAllWorkflows = async (req, res) => {
   try {
     const { status, search, sort = 'updatedAt', order = 'desc' } = req.query;
@@ -23,7 +23,7 @@ exports.getAllWorkflows = async (req, res) => {
       ];
     }
     
-    // Build sort
+    
     const sortOptions = {};
     sortOptions[sort] = order === 'asc' ? 1 : -1;
     
@@ -38,7 +38,7 @@ exports.getAllWorkflows = async (req, res) => {
   }
 };
 
-// GET a single workflow
+
 exports.getWorkflow = async (req, res) => {
   try {
     const workflow = await Workflow.findOne({
@@ -57,7 +57,7 @@ exports.getWorkflow = async (req, res) => {
   }
 };
 
-// CREATE a new workflow
+
 exports.createWorkflow = async (req, res) => {
   try {
     const { name, description, nodes, transitions, startNodeId, tags, metadata } = req.body;
@@ -80,7 +80,7 @@ exports.createWorkflow = async (req, res) => {
   }
 };
 
-// UPDATE a workflow
+
 exports.updateWorkflow = async (req, res) => {
   try {
     const { name, description, nodes, transitions, startNodeId, status, tags, metadata } = req.body;
@@ -94,7 +94,7 @@ exports.updateWorkflow = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Workflow not found' });
     }
     
-    // Update fields
+    
     if (name) workflow.name = name;
     if (description !== undefined) workflow.description = description;
     if (nodes) workflow.nodes = nodes;
@@ -111,7 +111,7 @@ exports.updateWorkflow = async (req, res) => {
       }
     }
     
-    // Increment version on significant changes
+  
     if (nodes || transitions || startNodeId) {
       workflow.version += 1;
     }
@@ -125,7 +125,7 @@ exports.updateWorkflow = async (req, res) => {
   }
 };
 
-// DELETE a workflow
+
 exports.deleteWorkflow = async (req, res) => {
   try {
     const workflow = await Workflow.findOne({
@@ -159,7 +159,7 @@ exports.deleteWorkflow = async (req, res) => {
   }
 };
 
-// CLONE a workflow
+
 exports.cloneWorkflow = async (req, res) => {
   try {
     const sourceWorkflow = await Workflow.findOne({
@@ -180,7 +180,7 @@ exports.cloneWorkflow = async (req, res) => {
   }
 };
 
-// EXECUTE a workflow
+
 exports.executeWorkflow = async (req, res) => {
   try {
     const workflow = await Workflow.findOne({
@@ -201,10 +201,9 @@ exports.executeWorkflow = async (req, res) => {
     
     const { initialData = {} } = req.body;
     
-    // Create workflow execution engine instance
     const executionEngine = new WorkflowExecutionEngine(workflow, req.io);
     
-    // Start workflow execution
+   
     const result = await executionEngine.startExecution(initialData);
     
     res.status(200).json({
@@ -218,12 +217,12 @@ exports.executeWorkflow = async (req, res) => {
   }
 };
 
-// GET all active workflows
+
 exports.getActiveWorkflows = async (req, res) => {
   try {
     const workflows = await Workflow.findActiveWorkflows(req.user.userId);
     
-    // For each workflow, get task summary
+    
     const workflowsWithTaskInfo = await Promise.all(workflows.map(async (workflow) => {
       const taskCounts = await Task.aggregate([
         { $match: { workflowId: workflow._id } },

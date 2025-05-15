@@ -1,7 +1,7 @@
-// models/Workflow.js - MongoDB Workflow schema
+
 const mongoose = require('mongoose');
 
-// Node schema - represents a node in the workflow
+
 const NodeSchema = new mongoose.Schema({
   id: { 
     type: String, 
@@ -24,7 +24,7 @@ const NodeSchema = new mongoose.Schema({
   }
 });
 
-// Transition schema - represents connections between nodes
+
 const TransitionSchema = new mongoose.Schema({
   id: { 
     type: String, 
@@ -58,7 +58,7 @@ const TransitionSchema = new mongoose.Schema({
   }
 });
 
-// Workflow schema - main schema for workflow definition
+
 const WorkflowSchema = new mongoose.Schema({
   name: { 
     type: String, 
@@ -97,10 +97,10 @@ const WorkflowSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// Create an index for faster lookups
+
 WorkflowSchema.index({ name: 1, createdBy: 1, status: 1 });
 
-// Method to clone a workflow
+
 WorkflowSchema.methods.clone = function() {
   const newWorkflow = new Workflow({
     name: `${this.name} - Copy`,
@@ -118,13 +118,12 @@ WorkflowSchema.methods.clone = function() {
   return newWorkflow.save();
 };
 
-// Method to activate a workflow
+
 WorkflowSchema.methods.activate = function() {
   this.status = 'active';
   return this.save();
 };
 
-// Static method to find active workflows
 WorkflowSchema.statics.findActiveWorkflows = function(userId) {
   return this.find({ 
     createdBy: userId, 
